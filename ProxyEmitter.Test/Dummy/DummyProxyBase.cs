@@ -1,7 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit.Abstractions;
 
 namespace ProxyEmitter.Test.Dummy
 {
@@ -17,9 +17,9 @@ namespace ProxyEmitter.Test.Dummy
         {
             CurrentNameSpace = @namespace;
             if (arguments != null)
-                TestContext.WriteLine("{0}({1})", methodName, string.Join(", ", arguments));
+                output.WriteLine("{0}({1})", methodName, string.Join(", ", arguments));
             else
-                TestContext.WriteLine("{0}()", methodName);
+                output.WriteLine("{0}()", methodName);
             switch (methodName)
             {
                 case "Fn1":
@@ -44,11 +44,11 @@ namespace ProxyEmitter.Test.Dummy
 
         #region For Test
 
-        public TestContext TestContext { get; set; }
+        private readonly ITestOutputHelper output;
 
-        public DummyProxyBase(TestContext testContext)
+        public DummyProxyBase(ITestOutputHelper output)
         {
-            TestContext = testContext;
+            this.output = output;
         }
         #endregion
     }

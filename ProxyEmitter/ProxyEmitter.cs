@@ -72,9 +72,9 @@ namespace ProxyEmitter
         public static Type CreateType(Type baseType, Type interfaceType)
         {
             // Validate
-            if (!interfaceType.IsInterface)
+            if (!interfaceType.GetTypeInfo().IsInterface)
                 throw new ArgumentException("Invalid interface type");
-            if (!baseType.IsSubclassOf(typeof(ProxyBase)))
+            if (!baseType.GetTypeInfo().IsSubclassOf(typeof(ProxyBase)))
                 throw new ArgumentException("Base type is not derived from ProxyBase");
             var type = GetCachedType(baseType, interfaceType);
             // Look up cache first
@@ -162,7 +162,7 @@ namespace ProxyEmitter
             }
 
             // Get namespace information
-            var namespaceAttr = interfaceType.GetCustomAttribute<ProxyNamespaceAttribute>();
+            var namespaceAttr = interfaceType.GetTypeInfo().GetCustomAttribute<ProxyNamespaceAttribute>();
             var ns = namespaceAttr == null ? "" : namespaceAttr.Namespace;
 
             // Create methods in interfaceType
@@ -175,7 +175,7 @@ namespace ProxyEmitter
                 Debug.WriteLine(method.Name);
                 EmitInterfaceMethod(tBuilder, ns, method, invokeMethod, convertMethod);
             }
-            var proxyType = tBuilder.CreateType();
+            var proxyType = tBuilder.CreateTypeInfo().AsType();
             return proxyType;
         }
 
@@ -242,11 +242,11 @@ namespace ProxyEmitter
             // Has return value
             if (method.ReturnType != typeof(void))
             {
-                ilGen.DeclareLocal(method.ReturnType).SetLocalSymInfo("RET");
+                ilGen.DeclareLocal(method.ReturnType);
             }
             // Has parameters
             if (pTypes.Length > 0)
-                ilGen.DeclareLocal(typeof(object[])).SetLocalSymInfo("Args");
+                ilGen.DeclareLocal(typeof(object[]));
 
         }
 
@@ -308,7 +308,7 @@ namespace ProxyEmitter
                     // IL_000X + 02: ldarg_X
                     DoEmit(ilGen, OpCodes.Ldarg_S, i + 1);
                     // Box value type
-                    if (pTypes[i].IsValueType)
+                    if (pTypes[i].GetTypeInfo().IsValueType)
                     {
                         // IL_000X + 03: box pTypes[i]
                         DoEmit(ilGen, OpCodes.Box, pTypes[i]);

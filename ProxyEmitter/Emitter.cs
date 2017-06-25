@@ -10,14 +10,6 @@ namespace ProxyEmitter
     /// </summary>
     public static class Emitter
     {
-        /// <summary>
-        /// Gets the <see cref="AppDomain"/> of current thread
-        /// </summary>
-        public static AppDomain CurrentDomain
-        {
-            get { return Thread.GetDomain(); }
-        }
-
         # region Global Methods
 
         /// <summary>
@@ -26,11 +18,9 @@ namespace ProxyEmitter
         /// <param name="name"></param>
         /// <param name="access"></param>
         /// <returns></returns>
-        public static AssemblyBuilder GetAssemblyBuilder(string name, AssemblyBuilderAccess access = AssemblyBuilderAccess.RunAndSave)
+        public static AssemblyBuilder GetAssemblyBuilder(string name, AssemblyBuilderAccess access = AssemblyBuilderAccess.RunAndCollect)
         {
-            var aname = new AssemblyName(name);
-            AppDomain currentDomain = AppDomain.CurrentDomain; 
-            AssemblyBuilder builder = currentDomain.DefineDynamicAssembly(aname, access);
+            AssemblyBuilder builder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(name), access);
             return builder;
         }
 
@@ -42,7 +32,7 @@ namespace ProxyEmitter
         /// <returns></returns>
         public static ModuleBuilder GetModule(AssemblyBuilder asmBuilder, String moduleName)
         {
-            ModuleBuilder builder = asmBuilder.DefineDynamicModule(moduleName, true);//"EmitMethods", "EmitMethods.dll");
+            ModuleBuilder builder = asmBuilder.DefineDynamicModule(moduleName);//"EmitMethods", "EmitMethods.dll");
             return builder;
         }
 
